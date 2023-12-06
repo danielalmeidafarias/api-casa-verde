@@ -37,56 +37,75 @@ const client_1 = require("@prisma/client");
 const plantas = (0, express_1.Router)();
 const prisma = new client_1.PrismaClient();
 plantas.use(express_1.default.json());
-plantas.route('/plantas')
+plantas
+    .route("/plantas")
     .get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const todasPlantas = yield prisma.planta.findMany();
     res.json(todasPlantas);
 }))
     .post((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const planta = req.body;
-    yield prisma.planta.create({
-        data: {
+    if (yield prisma.planta.findUnique({
+        where: {
             name: planta.name,
-            image: planta.image,
-            price: planta.price,
-            onSale: planta.onSale
-        }
-    }).then(() => {
-        res.sendStatus(201);
-    }).catch((e) => {
-        res.send(e);
-        console.error(e);
-    });
+        },
+    })) {
+        res.sendStatus(409);
+    }
+    else {
+        yield prisma.planta
+            .create({
+            data: {
+                name: planta.name,
+                image: planta.image,
+                price: planta.price,
+                onSale: planta.onSale,
+            },
+        })
+            .then(() => {
+            res.sendStatus(200);
+        })
+            .catch((e) => {
+            console.error(e);
+        });
+    }
 }));
-plantas.route('/plantas/:id')
+plantas
+    .route("/plantas/:id")
     .delete((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const idPlanta = req.params.id;
-    yield prisma.planta.delete({
+    yield prisma.planta
+        .delete({
         where: {
-            id: Number(idPlanta)
-        }
-    }).then(() => {
+            id: Number(idPlanta),
+        },
+    })
+        .then(() => {
         res.sendStatus(202);
-    }).catch((e) => {
+    })
+        .catch((e) => {
         res.send(e);
     });
 }))
     .put((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const idPlanta = req.params.id;
     const plantaAtualizada = req.body;
-    yield prisma.planta.update({
+    yield prisma.planta
+        .update({
         where: {
-            id: Number(idPlanta)
+            id: Number(idPlanta),
         },
         data: {
             name: plantaAtualizada.name,
             image: plantaAtualizada.image,
             onSale: plantaAtualizada.onSale,
-            price: plantaAtualizada.price
-        }
-    }).then(() => {
+            price: plantaAtualizada.price,
+        },
+    })
+        .then(() => {
         res.sendStatus(200);
-    }).catch((e) => {
+    })
+        .catch((e) => {
         res.send(e);
     });
 }));
