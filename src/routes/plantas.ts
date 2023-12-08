@@ -6,7 +6,7 @@ const plantas = Router();
 
 const prisma = new PrismaClient();
 
-plantas.use(express.json());
+plantas.use(express.json({ limit: '50mb' }));
 
 plantas
   .route("/plantas")
@@ -28,7 +28,6 @@ plantas
       res.sendStatus(409);
     } 
     else {
-
       await prisma.planta
       .create({
         data: {
@@ -52,6 +51,18 @@ plantas
 
 plantas
   .route("/plantas/:id")
+  .get(async (req: Request, res: Response) => {
+    const idPlanta = req.params.id;
+
+    const planta = await prisma.planta
+      .findUnique({
+        where: {
+          id: Number(idPlanta)
+        }
+      })
+
+    res.json(planta)
+  })
   .delete(async (req: Request, res: Response) => {
     const idPlanta = req.params.id;
 
@@ -91,5 +102,6 @@ plantas
         res.send(e);
       });
   });
+  
 
 export default plantas;

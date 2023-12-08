@@ -72,6 +72,16 @@ plantas
 }));
 plantas
     .route("/plantas/:id")
+    .get((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const idPlanta = req.params.id;
+    const planta = yield prisma.planta
+        .findUnique({
+        where: {
+            id: Number(idPlanta)
+        }
+    });
+    res.json(planta);
+}))
     .delete((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const idPlanta = req.params.id;
     yield prisma.planta
