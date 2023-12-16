@@ -1,10 +1,7 @@
 import express, { Router, Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../server'
 
 const promo = Router()
-const prisma = new PrismaClient()
-
-promo.use(express.json())
 
 promo.route('/promo')
 .get(async(req: Request, res: Response) => {

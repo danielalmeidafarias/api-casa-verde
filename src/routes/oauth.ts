@@ -1,13 +1,9 @@
 import { Request, Response, Router } from "express";
 // import { UserRefreshClient } from "google-auth-library";
 const nodemailer = require("nodemailer");
-
-const express = require("express");
 const { OAuth2Client } = require("google-auth-library");
 
 const oauth = Router();
-
-oauth.use(express.json());
 
 const oAuth2Client = new OAuth2Client(
   process.env.CLIENT_ID,
@@ -17,6 +13,8 @@ const oAuth2Client = new OAuth2Client(
 
 oauth.post("/oauth", async (req: Request, res: Response) => {
   const { tokens } = await oAuth2Client.getToken(req.body.code);
+  const subject = req.body.subject
+  const html = req.body.html
   
   console.log(tokens)
 
@@ -53,7 +51,7 @@ oauth.post("/oauth", async (req: Request, res: Response) => {
     {
       from: "danielalmeidafarias2002@gmail.com",
       to: [email, "danielalmeidafarias2002@gmail.com"],
-      subjects: "Obrigado por se inscrever na Casa Verde",
+      subjects: subject,
       html: 
       `
         <h1>Bem vindo ao NewsLetter da Casa Verde</h1>

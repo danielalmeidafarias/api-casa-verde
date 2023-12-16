@@ -17,3 +17,8 @@ model Planta {
   image String
   onSale Boolean?
 }
+
+model NewsLetterEmail {
+  id Int @unique @default(autoincrement())
+  email String @unique
+}

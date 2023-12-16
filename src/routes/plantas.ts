@@ -1,12 +1,8 @@
 import { Planta } from "./../interfaces/Planta";
 import express, { Router, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../server";
 
 const plantas = Router();
-
-const prisma = new PrismaClient();
-
-plantas.use(express.json({ limit: '50mb' }));
 
 plantas
   .route("/plantas")
