@@ -4,21 +4,33 @@
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 model Planta {
   id Int @unique @default(autoincrement())
   name String @unique
   price Float
   image String
   onSale Boolean?
+  cartId Int?
+  cart Cart? @relation(fields: [cartId], references: [id])
 }
-
 model NewsLetterEmail {
   id Int @unique @default(autoincrement())
   email String @unique
+}
+model User {
+  id String @unique
+  email String @unique
+  name String
+  isAdmin Boolean?
+  cart Cart[] 
+}
+model Cart {
+  id Int @unique @default(autoincrement())
+  userId String @unique
+  user User @relation(fields: [userId], references: [id])
+  plantas Planta[]
 }
