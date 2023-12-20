@@ -30,6 +30,7 @@ plantas
             image: planta.image,
             price: planta.price,
             onSale: planta.onSale,
+            number: planta.number
           },
         })
         .then(() => {
@@ -84,6 +85,7 @@ plantas
           image: plantaAtualizada.image,
           onSale: plantaAtualizada.onSale,
           price: plantaAtualizada.price,
+          number: plantaAtualizada.number
         },
       })
       .then(() => {

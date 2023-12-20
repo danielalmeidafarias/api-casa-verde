@@ -14,6 +14,7 @@ model Planta {
   price Float
   image String
   onSale Boolean?
+  number Int @default(0)
 }
 model NewsLetterEmail {
   id Int @unique @default(autoincrement())

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Planta" ADD COLUMN     "number" INTEGER NOT NULL DEFAULT 0;

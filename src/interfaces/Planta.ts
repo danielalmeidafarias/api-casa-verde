@@ -5,5 +5,6 @@ export interface Planta {
   price: number,
   image: string,
   onSale? : boolean
+  number? : number
 
 }
