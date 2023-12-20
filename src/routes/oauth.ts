@@ -1,13 +1,10 @@
 import { Request, Response, Router } from "express";
-import { JwtPayload, jwtDecode } from "jwt-decode";
+import {  jwtDecode } from "jwt-decode";
 import { prisma } from "../server";
 import { v4 as uuidv4 } from "uuid";
+import { DecodedToken } from "../interfaces/DecodedToken";
 
 const auth = Router();
-interface DecodedToken extends JwtPayload {
-  email: string;
-  name: string;
-}
 
 auth
   .route("/auth")
