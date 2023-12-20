@@ -22,27 +22,23 @@ plantas
       })
     ) {
       res.sendStatus(409);
-    } 
-    else {
+    } else {
       await prisma.planta
-      .create({
-        data: {
-          name: planta.name,
-          image: planta.image,
-          price: planta.price,
-          onSale: planta.onSale,
-        },
-      })
-      .then(() => {
-        res.sendStatus(200);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
-
+        .create({
+          data: {
+            name: planta.name,
+            image: planta.image,
+            price: planta.price,
+            onSale: planta.onSale,
+          },
+        })
+        .then(() => {
+          res.sendStatus(200);
+        })
+        .catch((e) => {
+          console.error(e);
+        });
     }
-
-
   });
 
 plantas
@@ -50,14 +46,13 @@ plantas
   .get(async (req: Request, res: Response) => {
     const idPlanta = req.params.id;
 
-    const planta = await prisma.planta
-      .findUnique({
-        where: {
-          id: Number(idPlanta)
-        }
-      })
+    const planta = await prisma.planta.findUnique({
+      where: {
+        id: Number(idPlanta),
+      }
+    });
 
-    res.json(planta)
+    res.json(planta);
   })
   .delete(async (req: Request, res: Response) => {
     const idPlanta = req.params.id;
@@ -98,6 +93,5 @@ plantas
         res.send(e);
       });
   });
-  
 
 export default plantas;

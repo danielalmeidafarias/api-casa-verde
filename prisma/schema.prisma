@@ -14,8 +14,6 @@ model Planta {
   price Float
   image String
   onSale Boolean?
-  cartId Int?
-  cart Cart? @relation(fields: [cartId], references: [id])
 }
 model NewsLetterEmail {
   id Int @unique @default(autoincrement())
@@ -26,11 +24,4 @@ model User {
   email String @unique
   name String
   isAdmin Boolean?
-  cart Cart[] 
-}
-model Cart {
-  id Int @unique @default(autoincrement())
-  userId String @unique
-  user User @relation(fields: [userId], references: [id])
-  plantas Planta[]
 }

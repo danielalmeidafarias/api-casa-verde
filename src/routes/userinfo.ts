@@ -4,22 +4,15 @@ import { prisma } from "../server";
 const userInfo = Router();
 
 userInfo.route("/userinfo/:userid").get(async (req: Request, res: Response) => {
-  const userId = req.params.id;
+  const userId = req.params.userid;
 
   const user = await prisma.user.findUnique({
     where: {
-      id: userId
+      id: userId,
     },
   });
-  
-  // const cart = await prisma.cart.findUnique({
-  //   where: {
-  //     userId: userId,
-  //   },
-  // });
 
-  // res.send({ user, cart })
-  res.send({message: 'Hello world'})
+  res.send(user);
 });
 
-export default userInfo
+export default userInfo;

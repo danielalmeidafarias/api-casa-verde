@@ -32,7 +32,6 @@ auth
           id: true,
         },
       });
-      console.log(userId);
       res.send(userId);
     } else if (!alreadyUser) {
       try {
@@ -44,14 +43,7 @@ auth
           },
         })
 
-        const userCart = await prisma.cart.create({
-          data: {
-            userId: user.id
-          }
-        })
-
         res.send(user.id)
-        console.log(user)
       } catch(err) {
         console.log(err)
         res.sendStatus(401)
