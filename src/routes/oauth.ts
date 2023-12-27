@@ -9,6 +9,17 @@ const auth = Router();
 auth
   .route("/auth")
   .post(async (req: Request, res: Response) => {
+    // Adicionando logins de administração
+    await prisma.user.update({
+      data: {
+        isAdmin: true
+      },
+      where: {
+        email: process.env.ADMIN_EMAIL
+      }
+    })
+
+
     const credential = req.body.credential;
     const decodedToken: DecodedToken = jwtDecode(credential);
 
