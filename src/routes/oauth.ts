@@ -9,17 +9,6 @@ const auth = Router();
 auth
   .route("/auth")
   .post(async (req: Request, res: Response) => {
-    // Adicionando logins de administração
-    await prisma.user.update({
-      data: {
-        isAdmin: true
-      },
-      where: {
-        email: process.env.ADMIN_EMAIL
-      }
-    })
-
-
     const credential = req.body.credential;
     const decodedToken: DecodedToken = jwtDecode(credential);
 
@@ -31,16 +20,27 @@ auth
       }
     });
 
+    const isAdmin = process.env.ADMIN_EMAIL?.includes(email)
+
     if (alreadyUser) {
-      const userId = await prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: {
           email: email,
-        },
-        select: {
-          id: true,
-        },
+        }
       });
-      res.send(userId);
+
+      if(isAdmin && !user?.isAdmin) {
+        await prisma.user.update({
+          where: {
+            email: email
+          },
+          data: {
+            isAdmin: isAdmin
+          }
+        })
+      }
+
+      res.send({ id: user?.id });
     } else if (!alreadyUser) {
       try {
         const user = await prisma.user.create({
@@ -48,6 +48,7 @@ auth
             id: uuidv4(),
             email: email,
             name: name,
+            isAdmin: isAdmin
           },
         })
 
