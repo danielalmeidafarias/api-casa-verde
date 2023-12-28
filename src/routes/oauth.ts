@@ -28,7 +28,6 @@ auth
           email: email,
         }
       });
-
       if((isAdmin && !user?.isAdmin) || (!isAdmin && user?.isAdmin)) {
         await prisma.user.update({
           where: {
