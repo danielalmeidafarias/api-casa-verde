@@ -121,8 +121,8 @@ newsLetter
     };
 
     try {
-      sendEmail(transporter, mailOptions)
-      res.sendStatus(200)
+      sendEmail(transporter, mailOptions);
+      res.sendStatus(200);
     } catch (err) {
       res.send(err);
       console.error(err);

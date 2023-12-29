@@ -30,7 +30,7 @@ plantas
             image: planta.image,
             price: planta.price,
             onSale: planta.onSale,
-            number: planta.number
+            number: planta.number,
           },
         })
         .then(() => {
@@ -50,7 +50,7 @@ plantas
     const planta = await prisma.planta.findUnique({
       where: {
         id: Number(idPlanta),
-      }
+      },
     });
 
     res.json(planta);
@@ -85,7 +85,7 @@ plantas
           image: plantaAtualizada.image,
           onSale: plantaAtualizada.onSale,
           price: plantaAtualizada.price,
-          number: plantaAtualizada.number
+          number: plantaAtualizada.number,
         },
       })
       .then(() => {
