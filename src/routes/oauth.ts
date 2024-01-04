@@ -39,7 +39,7 @@ auth
         });
       }
 
-      res.send({ id: user?.id });
+      res.send(user);
     } else if (!alreadyUser) {
       try {
         const user = await prisma.user.create({
@@ -51,7 +51,7 @@ auth
           },
         });
 
-        res.send(user.id);
+        res.send(user);
       } catch (err) {
         console.log(err);
         res.sendStatus(401);
