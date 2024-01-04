@@ -3,6 +3,6 @@ export interface Planta {
   name: string;
   price: number;
   image: string;
-  onSale?: boolean;
-  number?: number;
+  onSale: boolean | null;
+  number: number;
 }
