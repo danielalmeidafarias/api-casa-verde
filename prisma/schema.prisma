@@ -29,4 +29,16 @@ model User {
   email   String   @unique
   name    String
   isAdmin Boolean?
+  pedidos Pedido[]
+}
+
+model Pedido {
+  id String @unique
+  cart Json
+  status String
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  date DateTime @default(now())
+  subTotal Int
+  paymentUrl String
 }

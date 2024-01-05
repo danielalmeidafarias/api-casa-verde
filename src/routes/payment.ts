@@ -1,12 +1,9 @@
-import express, { Response, Request, Router } from "express";
-import { ICartProduct, TCart } from "../interfaces/ICart";
+import { Response, Request, Router } from "express";
+import { TCart } from "../interfaces/ICart";
+import { prisma } from "../server";
 const stripe = require("stripe")(process.env.STRIPE_KEY);
-const cors = require("cors");
 
 const payment = Router();
-
-payment.use(cors());
-payment.use(express.static("public"));
 
 // Criar uma função para verificar se a quantidade de produto requisitada está disponível
 // Se positivo, após a compra confirmada, diminuir a quantidade do produto no estoque
@@ -16,6 +13,7 @@ payment
 
   .post(async (req: Request, res: Response) => {
     const cart: TCart = req.body.cart;
+    const userId: string = req.body.userId
 
     const session = await stripe.checkout.sessions.create({
       line_items: cart.map((product) => {
@@ -37,8 +35,20 @@ payment
       cancel_url: `http://localhost:5173/paymentfailed`,
     });
 
-    // res.redirect(303, session.url);
+    const pedido = await prisma.pedido.create({
+      data: {
+        cart: cart,
+        id: session.id,
+        status: session.status,
+        userId: userId,
+        subTotal: session.amount_total / 100,
+        paymentUrl: session.url
+      }
+    })
+
+    console.log(session)
+
     res.send({ href: session.url });
-  });
+  })
 
 export default payment;

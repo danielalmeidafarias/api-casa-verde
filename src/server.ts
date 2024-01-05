@@ -6,6 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import newsLetter from "./routes/newsletter";
 import userInfo from "./routes/userinfo";
 import payment from "./routes/payment";
+import pedidos from "./routes/pedidos";
 
 export const prisma = new PrismaClient();
 
@@ -27,6 +28,8 @@ app.use("/api", auth);
 app.use("/api", userInfo);
 
 app.use("/api", payment);
+
+app.use("/api", pedidos);
 
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}/api`);
