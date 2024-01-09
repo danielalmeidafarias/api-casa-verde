@@ -38,7 +38,7 @@ model Pedido {
   user          User     @relation(fields: [userId], references: [id])
   userId        String
   date          DateTime @default(now())
-  paymentIntent String?   @unique
+  paymentIntent String?  @unique
   paymentUrl    String
   subTotal      Int
   status        String

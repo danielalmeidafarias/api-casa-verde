@@ -1,5 +1,5 @@
 import { Planta } from "./../interfaces/Planta";
-import express, { Router, Request, Response } from "express";
+import { Router, Request, Response } from "express";
 import { prisma } from "../server";
 
 const plantas = Router();

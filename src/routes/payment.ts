@@ -13,41 +13,62 @@ payment
 
   .post(async (req: Request, res: Response) => {
     const cart: TCart = req.body.cart;
-    const userId: string = req.body.userId
+    const userId: string = req.body.userId;
 
-    const session = await stripe.checkout.sessions.create({
-      line_items: cart.map((product) => {
-        return {
-          price_data: {
-            currency: "brl",
-            unit_amount: product.price * 100,
-            product_data: {
-              name: product.name,
-            },
-          },
-          quantity: product.number,
-        };
-      }),
+    let verifyEstoque: boolean = false;
 
-      mode: "payment",
-      success_url: `http://localhost:5173/paymentsuccess`,
-      cancel_url: `http://localhost:5173/paymentfailed`,
+    const estoque = await prisma.planta.findMany();
+
+    cart.forEach((produto) => {
+      const estoqueFiltrado = estoque.filter(produtoEstoque => {
+        return produtoEstoque.id === produto.id
+      })[0]
+
+      if (estoqueFiltrado && estoqueFiltrado.number < produto.number) {
+        verifyEstoque = true;
+        console.log(produto.number);
+        console.log(estoqueFiltrado?.number, produto.name);
+      }
     });
 
-    await prisma.pedido.create({
-      data: {
-        cart: cart,
-        id: session.id,
-        status: session.status,
-        userId: userId,
-        subTotal: session.amount_total / 100,
-        paymentUrl: session.url,
-        paymentIntent: undefined
-      }
-    })
+    if (!verifyEstoque) {
+      console.log(verifyEstoque);
 
-    console.log(session)
-    res.send({ href: session.url });
-  })
+      const session = await stripe.checkout.sessions.create({
+        line_items: cart.map((product) => {
+          return {
+            price_data: {
+              currency: "brl",
+              unit_amount: product.price * 100,
+              product_data: {
+                name: product.name,
+              },
+            },
+            quantity: product.number,
+          };
+        }),
+
+        mode: "payment",
+        success_url: `http://localhost:5173/paymentsuccess`,
+        cancel_url: `http://localhost:5173/paymentfailed`,
+      });
+
+      await prisma.pedido.create({
+        data: {
+          cart: cart,
+          id: session.id,
+          status: session.status,
+          userId: userId,
+          subTotal: session.amount_total / 100,
+          paymentUrl: session.url,
+          paymentIntent: undefined,
+        },
+      });
+
+      res.send({ href: session.url });
+    } else {
+      res.status(400).send();
+    }
+  });
 
 export default payment;
