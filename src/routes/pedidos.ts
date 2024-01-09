@@ -1,6 +1,7 @@
 import { Response, Request, Router } from "express";
 import { TCart } from "../interfaces/ICart";
 import { prisma } from "../server";
+import { IPedido } from "../interfaces/IPedido";
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 const pedidos = Router();
@@ -8,52 +9,50 @@ const pedidos = Router();
 pedidos.route("/pedidos/:userId").get(async (req: Request, res: Response) => {
   const userId = req.params.userId;
 
-  const pedidos = await prisma.pedido.findMany({
+  let pedidos = await prisma.pedido.findMany({
     where: {
       userId: userId,
     },
-    select: {
-      id: true
-    },
+    orderBy: {
+      date: "desc"
+    }
   });
 
   res.send(pedidos);
 });
 
-pedidos.route("/pedidos/:userId/:session_id").get(async (req: Request, res: Response) => {
-  const userId = req.params.userId;
-  const session_id = req.params.session_id;
+pedidos
+  .route(`/pedidos/:userId/cancel`)
+  .put(async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    const session_id = req.body.session_id;
 
-  const session = await stripe.checkout.sessions.retrieve(session_id);
+    await stripe.checkout.sessions.expire(session_id);
 
-  // const session = await stripe.checkout.sessions.expire(session_id);
-
-  const pedido = await prisma.pedido.findUnique({
-    where: {
-      id: session_id,
-      userId: userId,
-    },
-  })
-
-  if (pedido?.status !== session.status) {
-    const pedido = await prisma.pedido.update({
+    await prisma.pedido.update({
       where: {
-        id: session_id,
         userId: userId,
+        id: session_id,
       },
       data: {
-        status: session.status,
+        status: `expired`,
       },
     });
-  }
 
-  // await prisma.pedido.deleteMany({
-  //   where: {
-  //     userId: userId
-  //   }
-  // })
+    res.sendStatus(200);
+  });
 
-  res.send(pedido);
-});
+pedidos
+  .route(`/pedidos/:userId/refound`)
+  .put(async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    const payment_intent = req.body.payment_intent;
+
+    await stripe.refunds.create({
+      payment_intent: payment_intent,
+    });
+
+    res.send(200);
+  });
 
 export default pedidos;

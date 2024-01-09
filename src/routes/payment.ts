@@ -23,7 +23,6 @@ payment
             unit_amount: product.price * 100,
             product_data: {
               name: product.name,
-              // images: ['https://example.com/t-shirt.png'],
             },
           },
           quantity: product.number,
@@ -35,19 +34,19 @@ payment
       cancel_url: `http://localhost:5173/paymentfailed`,
     });
 
-    const pedido = await prisma.pedido.create({
+    await prisma.pedido.create({
       data: {
         cart: cart,
         id: session.id,
         status: session.status,
         userId: userId,
         subTotal: session.amount_total / 100,
-        paymentUrl: session.url
+        paymentUrl: session.url,
+        paymentIntent: undefined
       }
     })
 
     console.log(session)
-
     res.send({ href: session.url });
   })
 
