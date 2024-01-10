@@ -44,7 +44,7 @@ webhooks
         break;
       case "checkout.session.expired":
         const checkoutSessionExpired = event.data.object;
-
+        console.log(checkoutSessionExpired)
         try {
           await prisma.pedido.update({
             where: {

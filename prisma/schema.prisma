@@ -17,6 +17,7 @@ model Planta {
   image  String
   onSale Boolean?
   number Int      @default(0)
+  tempNumber Int @default(0)
 }
 
 model NewsLetterEmail {

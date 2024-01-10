@@ -5,4 +5,5 @@ export interface Planta {
   image: string;
   onSale: boolean | null;
   number: number;
+  tempNumber: number;
 }
