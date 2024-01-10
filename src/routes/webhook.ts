@@ -1,5 +1,6 @@
 import { Router, Response, Request } from "express";
 import { prisma } from "../server";
+const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 const webhooks = Router();
 
@@ -11,15 +12,31 @@ webhooks
     switch (event.type) {
       case "checkout.session.completed":
         const checkoutSessionCompleted = event.data.object;
+        const paymentIntent = await stripe.paymentIntents.retrieve(
+          checkoutSessionCompleted.payment_intent
+        );
+
         try {
-          await prisma.pedido.update({
-            where: {
-              id: checkoutSessionCompleted.id,
-            },
-            data: {
-              paymentIntent: checkoutSessionCompleted.payment_intent,
-            },
-          });
+          if (paymentIntent.status === `succeeded`) {
+            await prisma.pedido.update({
+              where: {
+                id: checkoutSessionCompleted.id,
+              },
+              data: {
+                paymentIntent: checkoutSessionCompleted.payment_intent,
+                status: `complete`,
+              },
+            });
+          } else {
+            await prisma.pedido.update({
+              where: {
+                id: checkoutSessionCompleted.id,
+              },
+              data: {
+                paymentIntent: checkoutSessionCompleted.payment_intent,
+              },
+            });
+          }
         } catch (err) {
           console.error(err);
         }
@@ -29,14 +46,23 @@ webhooks
         const paymentIntentSucceeded = event.data.object;
 
         try {
-          await prisma.pedido.update({
+          const pedidoIntendPayment = await prisma.pedido.findUnique({
             where: {
               paymentIntent: paymentIntentSucceeded.id,
             },
-            data: {
-              status: `complete`,
-            },
           });
+
+          if (pedidoIntendPayment) {
+            await prisma.pedido.update({
+              where: {
+                paymentIntent: paymentIntentSucceeded.id,
+              },
+              data: {
+                status: `complete`,
+              },
+            });
+          }
+          
         } catch (err) {
           console.error(err);
         }
@@ -44,7 +70,7 @@ webhooks
         break;
       case "checkout.session.expired":
         const checkoutSessionExpired = event.data.object;
-        console.log(checkoutSessionExpired)
+        console.log(checkoutSessionExpired);
         try {
           await prisma.pedido.update({
             where: {
@@ -77,7 +103,7 @@ webhooks
 
         break;
       default:
-        console.log(`Unhandled event type ${event.type}`);
+        null;
     }
 
     response.send();
