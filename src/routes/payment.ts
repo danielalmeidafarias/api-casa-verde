@@ -24,9 +24,9 @@ payment.route("/payment").post(async (req: Request, res: Response) => {
       available = false;
       const filteredCart = Array.from(cart, (product) => {
         if (product.id === produtoEstoque.id && !available) {
-          return produtoEstoque;
+          return produtoEstoque
         } else return product;
-      });
+      }).filter(product => product.number > 0)
       return res.status(409).send({ produtoEstoque, filteredCart });
     }
   });
