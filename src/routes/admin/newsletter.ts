@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { prisma } from "../server";
+import { prisma } from "../../server";
 const nodemailer = require("nodemailer");
 
 const newsLetter = Router();

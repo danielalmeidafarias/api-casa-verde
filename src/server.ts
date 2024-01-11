@@ -3,11 +3,12 @@ import plantas from "./routes/plantas";
 import promo from "./routes/promo";
 import auth from "./routes/oauth";
 import { PrismaClient } from "@prisma/client";
-import newsLetter from "./routes/newsletter";
+import newsLetter from "./routes/admin/newsletter";
 import userInfo from "./routes/userinfo";
 import payment from "./routes/payment";
 import pedidos from "./routes/pedidos";
 import webhooks from "./routes/webhook";
+import admin from "./routes/admin/admin";
 
 export const prisma = new PrismaClient();
 
@@ -33,6 +34,8 @@ app.use("/api", payment);
 app.use("/api", pedidos);
 
 app.use("/api", webhooks);
+
+app.use("/admin", admin)
 
 
 app.listen(port, () => {
