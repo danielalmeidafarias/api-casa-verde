@@ -2,7 +2,13 @@ import { NextFunction, Request, Response } from "express";
 import { prisma } from "../server";
 
 const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
-  const adminId = req.body.adminId;
+  let adminId
+
+  if(req.method === "GET" || req.method === "DELETE"  || req.method === "PUT" ) {
+    adminId = req.query.adminId;
+  } else {
+    adminId = req.body.adminId;
+  }
 
   if (adminId) {
     const adminUser = await prisma.user.findUnique({

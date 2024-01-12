@@ -12,7 +12,12 @@ plantas.route("/plantas").get(async (req: Request, res: Response) => {
       },
     },
     select: {
-      tempNumber: false,
+      id: true,
+      image: true,
+      name: true,
+      onSale: true,
+      price: true,
+      tempNumber: true
     },
   });
 
@@ -27,11 +32,23 @@ plantas.route("/plantas/:id").get(async (req: Request, res: Response) => {
       id: Number(idPlanta),
     },
     select: {
-      tempNumber: false,
+      id: true,
+      image: true,
+      name: true,
+      onSale: true,
+      price: true,
+      tempNumber: true
     },
   });
 
-  res.json(planta);
+  res.json({
+    id: planta?.id,
+    image: planta?.image,
+    name: planta?.name,
+    onSale: planta?.onSale,
+    price: planta?.price,
+    number: planta?.tempNumber
+  });
 });
 
 export default plantas;
