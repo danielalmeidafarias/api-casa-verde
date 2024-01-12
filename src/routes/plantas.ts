@@ -8,7 +8,7 @@ plantas.route("/plantas").get(async (req: Request, res: Response) => {
   const todasPlantas = await prisma.planta.findMany({
     where: {
       NOT: {
-        number: 0,
+        tempNumber: 0,
       },
     },
     select: {

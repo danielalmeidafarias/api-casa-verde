@@ -1,5 +1,6 @@
 import { Router, Response, Request } from "express";
 import { prisma } from "../server";
+import { TCart } from "../interfaces/ICart";
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 const webhooks = Router();
@@ -18,7 +19,7 @@ webhooks
 
         try {
           if (paymentIntent.status === `succeeded`) {
-            await prisma.pedido.update({
+            const checkoutSessionPedido = await prisma.pedido.update({
               where: {
                 id: checkoutSessionCompleted.id,
               },
@@ -27,6 +28,23 @@ webhooks
                 status: `complete`,
               },
             });
+
+            const cart: TCart = JSON.parse(
+              JSON.stringify(checkoutSessionPedido.cart)
+            );
+
+            for (let product of cart) {
+              await prisma.planta.update({
+                where: {
+                  id: product.id,
+                },
+                data: {
+                  number: {
+                    decrement: product.number,
+                  },
+                },
+              });
+            }
           } else {
             await prisma.pedido.update({
               where: {
@@ -61,8 +79,24 @@ webhooks
                 status: `complete`,
               },
             });
+
+            const cart: TCart = JSON.parse(
+              JSON.stringify(pedidoIntendPayment.cart)
+            );
+
+            for (let product of cart) {
+              await prisma.planta.update({
+                where: {
+                  id: product.id,
+                },
+                data: {
+                  number: {
+                    decrement: product.number,
+                  },
+                },
+              });
+            }
           }
-          
         } catch (err) {
           console.error(err);
         }
@@ -72,7 +106,7 @@ webhooks
         const checkoutSessionExpired = event.data.object;
         console.log(checkoutSessionExpired);
         try {
-          await prisma.pedido.update({
+          const expiredPedido = await prisma.pedido.update({
             where: {
               id: checkoutSessionExpired.id,
             },
@@ -80,6 +114,21 @@ webhooks
               status: `expired`,
             },
           });
+
+          const cart: TCart = JSON.parse(JSON.stringify(expiredPedido.cart));
+
+          for (let product of cart) {
+            await prisma.planta.update({
+              where: {
+                id: product.id,
+              },
+              data: {
+                tempNumber: {
+                  increment: product.number,
+                },
+              },
+            });
+          }
         } catch (err) {
           console.error(err);
         }
@@ -89,7 +138,7 @@ webhooks
         const chargeRefunded = event.data.object;
 
         try {
-          await prisma.pedido.update({
+          const chargedPedido = await prisma.pedido.update({
             where: {
               paymentIntent: chargeRefunded.payment_intent,
             },
@@ -97,6 +146,24 @@ webhooks
               status: "expired",
             },
           });
+
+          const cart: TCart = JSON.parse(JSON.stringify(chargedPedido.cart));
+
+          for (let product of cart) {
+            await prisma.planta.update({
+              where: {
+                id: product.id,
+              },
+              data: {
+                tempNumber: {
+                  increment: product.number,
+                },
+                number: {
+                  increment: product.number,
+                },
+              },
+            });
+          }
         } catch (err) {
           console.error(err);
         }

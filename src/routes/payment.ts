@@ -20,12 +20,24 @@ payment.route("/payment").post(async (req: Request, res: Response) => {
       return produtoEstoque.id === produto.id;
     })[0];
 
-    if (produtoEstoque && produtoEstoque.number < produto.number && available) {
+    if (produtoEstoque && produtoEstoque.tempNumber < produto.number && available) {
       available = false;
       const filteredCart = Array.from(cart, (product) => {
         if (product.id === produtoEstoque.id && !available) {
-          return produtoEstoque
-        } else return product;
+          return  {
+            id: produtoEstoque.id,
+            name: produtoEstoque.name,
+            price: produtoEstoque.price,
+            number: produtoEstoque.tempNumber
+          }
+        } else {
+          return {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            number: product.number
+          }
+        };
       }).filter(product => product.number > 0)
       return res.status(409).send({ produtoEstoque, filteredCart });
     }
@@ -62,6 +74,20 @@ payment.route("/payment").post(async (req: Request, res: Response) => {
         paymentIntent: undefined,
       },
     });
+
+    for(let product of cart) {
+      await prisma.planta.update({
+        where: {
+          id: product.id
+        },
+        data: {
+          tempNumber: {
+            decrement: product.number
+          }
+        }
+      })
+    }
+
 
     res.send({ href: session.url });
   }

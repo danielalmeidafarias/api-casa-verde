@@ -81,7 +81,9 @@ plantas
           image: plantaAtualizada.image,
           onSale: plantaAtualizada.onSale,
           price: plantaAtualizada.price,
-          number: plantaAtualizada.number,
+          number: {
+            increment: plantaAtualizada.number
+          }
         },
       })
       .then(() => {
