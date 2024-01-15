@@ -2,7 +2,7 @@ export type ICartProduct = {
   id: number;
   number: number;
   price: number;
-  name: string
+  name: string;
 };
 
 export type TCart = ICartProduct[];

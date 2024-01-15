@@ -53,7 +53,6 @@ auth
 
         res.send(user);
       } catch (err) {
-        console.log(err);
         res.sendStatus(401);
       }
     }

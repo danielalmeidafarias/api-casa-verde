@@ -11,13 +11,13 @@ datasource db {
 }
 
 model Planta {
-  id     Int      @unique @default(autoincrement())
-  name   String   @unique
-  price  Float
-  image  String
-  onSale Boolean?
-  number Int      @default(0)
-  tempNumber Int @default(0)
+  id         Int      @unique @default(autoincrement())
+  name       String   @unique
+  price      Float
+  image      String
+  onSale     Boolean?
+  number     Int      @default(0)
+  tempNumber Int      @default(0)
 }
 
 model NewsLetterEmail {

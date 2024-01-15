@@ -18,7 +18,6 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async (transporter: any, mailOptions: any) => {
   try {
     await transporter.sendMail(mailOptions);
-    console.log("Email enviado com sucesso");
   } catch (err) {
     console.error(err);
   }
@@ -90,4 +89,4 @@ newsLetter
     }
   });
 
-export default newsLetter
+export default newsLetter;

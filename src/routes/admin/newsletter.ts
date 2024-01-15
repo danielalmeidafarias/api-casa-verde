@@ -18,7 +18,6 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async (transporter: any, mailOptions: any) => {
   try {
     await transporter.sendMail(mailOptions);
-    console.log("Email enviado com sucesso");
   } catch (err) {
     console.error(err);
   }
@@ -27,7 +26,7 @@ const sendEmail = async (transporter: any, mailOptions: any) => {
 newsLetter
   .route("/newsletter/send")
   .get(async (req: Request, res: Response) => {
-    res.sendStatus(200)
+    res.sendStatus(200);
   })
   .post(async (req: Request, res: Response) => {
     const emails = Array.from(

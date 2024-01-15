@@ -17,7 +17,7 @@ plantas.route("/plantas").get(async (req: Request, res: Response) => {
       name: true,
       onSale: true,
       price: true,
-      tempNumber: true
+      tempNumber: true,
     },
   });
 
@@ -37,7 +37,7 @@ plantas.route("/plantas/:id").get(async (req: Request, res: Response) => {
       name: true,
       onSale: true,
       price: true,
-      tempNumber: true
+      tempNumber: true,
     },
   });
 
@@ -47,7 +47,7 @@ plantas.route("/plantas/:id").get(async (req: Request, res: Response) => {
     name: planta?.name,
     onSale: planta?.onSale,
     price: planta?.price,
-    number: planta?.tempNumber
+    number: planta?.tempNumber,
   });
 });
 

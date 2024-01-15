@@ -4,11 +4,11 @@ import plantas from "./plantas";
 import newsLetter from "./newsletter";
 import users from "./users";
 
-const admin = Router()
-admin.use(isAdmin)
+const admin = Router();
+admin.use(isAdmin);
 
-admin.use(plantas)
-admin.use(newsLetter)
-admin.use(users)
+admin.use(plantas);
+admin.use(newsLetter);
+admin.use(users);
 
-export default admin
+export default admin;

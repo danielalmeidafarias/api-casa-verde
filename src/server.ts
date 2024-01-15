@@ -35,8 +35,7 @@ app.use("/api", pedidos);
 
 app.use("/api", webhooks);
 
-app.use("/admin", admin)
-
+app.use("/admin", admin);
 
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}/api`);

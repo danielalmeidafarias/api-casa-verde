@@ -14,8 +14,8 @@ pedidos.route("/pedidos/:userId").get(async (req: Request, res: Response) => {
       userId: userId,
     },
     orderBy: {
-      date: "desc"
-    }
+      date: "desc",
+    },
   });
 
   res.send(pedidos);
