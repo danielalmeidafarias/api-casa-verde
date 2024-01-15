@@ -7,19 +7,8 @@ const plantas = Router();
 plantas
   .route("/plantas")
   .get(async (req: Request, res: Response) => {
-    // const idPlanta = req.query.id;
-
-    // if (idPlanta) {
-    //   const planta = await prisma.planta.findUnique({
-    //     where: {
-    //       id: Number(idPlanta),
-    //     },
-    //   });
-    //   res.json(planta);
-    // } else {
-      const todasPlantas = await prisma.planta.findMany();
-      res.json(todasPlantas);
-    // }
+    const todasPlantas = await prisma.planta.findMany();
+    res.json(todasPlantas);
   })
   .post(async (req: Request, res: Response) => {
     const planta: Planta = req.body.planta;
@@ -82,8 +71,11 @@ plantas
           onSale: plantaAtualizada.onSale,
           price: plantaAtualizada.price,
           number: {
-            increment: plantaAtualizada.number
-          }
+            increment: plantaAtualizada.number,
+          },
+          tempNumber: {
+            increment: plantaAtualizada.number,
+          },
         },
       })
       .then(() => {

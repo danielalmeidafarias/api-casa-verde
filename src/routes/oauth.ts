@@ -58,11 +58,6 @@ auth
       }
     }
   })
-  .get(async (req: Request, res: Response) => {
-    const users = await prisma.user.findMany();
-
-    res.send(users);
-  })
   .delete(async (req: Request, res: Response) => {
     const id = req.body.id;
 

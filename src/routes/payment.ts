@@ -5,8 +5,6 @@ const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 const payment = Router();
 
-// Se positivo, após a compra confirmada, diminuir a quantidade do produto no estoque
-
 payment.route("/payment").post(async (req: Request, res: Response) => {
   const cart: TCart = req.body.cart;
   const userId: string = req.body.userId;
@@ -62,6 +60,8 @@ payment.route("/payment").post(async (req: Request, res: Response) => {
       success_url: `http://localhost:5173/paymentsuccess`,
       cancel_url: `http://localhost:5173/paymentfailed`,
     });
+    const date = new Date()
+    console.log(date.getTime())
 
     await prisma.pedido.create({
       data: {
