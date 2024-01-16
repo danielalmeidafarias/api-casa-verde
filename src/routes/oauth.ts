@@ -10,48 +10,60 @@ auth
   .route("/auth")
   .post(async (req: Request, res: Response) => {
     const credential = req.body.credential;
-    const decodedToken: DecodedToken = jwtDecode(credential);
 
-    const { email, name } = decodedToken;
+    if (!credential) {
+      res.sendStatus(401);
+    } else {
+      try {
+        const decodedToken: DecodedToken = jwtDecode(credential);
 
-    const alreadyUser = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
+        const { email, name } = decodedToken;
+        console.log(decodedToken);
 
-    const isAdmin = process.env.ADMIN_EMAIL?.includes(email);
-
-    if (alreadyUser) {
-      const user = await prisma.user.findUnique({
-        where: {
-          email: email,
-        },
-      });
-      if ((isAdmin && !user?.isAdmin) || (!isAdmin && user?.isAdmin)) {
-        await prisma.user.update({
+        const alreadyUser = await prisma.user.findUnique({
           where: {
             email: email,
           },
-          data: {
-            isAdmin: isAdmin,
-          },
         });
-      }
+        console.log(alreadyUser);
 
-      res.send(user);
-    } else if (!alreadyUser) {
-      try {
-        const user = await prisma.user.create({
-          data: {
-            id: uuidv4(),
-            email: email,
-            name: name,
-            isAdmin: isAdmin,
-          },
-        });
+        const isAdmin = process.env.ADMIN_EMAIL?.includes(email);
+        console.log(isAdmin);
 
-        res.send(user);
+        if (alreadyUser) {
+          const user = await prisma.user.findUnique({
+            where: {
+              email: email,
+            },
+          });
+          if ((isAdmin && !user?.isAdmin) || (!isAdmin && user?.isAdmin)) {
+            await prisma.user.update({
+              where: {
+                email: email,
+              },
+              data: {
+                isAdmin: isAdmin,
+              },
+            });
+          }
+
+          res.send(user);
+        } else if (!alreadyUser) {
+          try {
+            const user = await prisma.user.create({
+              data: {
+                id: uuidv4(),
+                email: email,
+                name: name,
+                isAdmin: isAdmin,
+              },
+            });
+
+            res.send(user);
+          } catch (err) {
+            res.sendStatus(401);
+          }
+        }
       } catch (err) {
         res.sendStatus(401);
       }
