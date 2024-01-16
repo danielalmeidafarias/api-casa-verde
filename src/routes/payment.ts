@@ -61,8 +61,8 @@ payment.route("/payment").post(async (req: Request, res: Response) => {
       }),
 
       mode: "payment",
-      success_url: `http://localhost:5173/paymentsuccess`,
-      cancel_url: `http://localhost:5173/paymentfailed`,
+      success_url: `https://casa-verde-alpha-seven.vercel.app/paymentsuccess`,
+      cancel_url: `https://casa-verde-alpha-seven.vercel.app/paymentfailed`,
     });
     const date = new Date();
 
