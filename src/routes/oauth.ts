@@ -12,23 +12,20 @@ auth
     const credential = req.body.credential;
 
     if (!credential) {
-      res.sendStatus(401);
+      return res.sendStatus(401);
     } else {
       try {
         const decodedToken: DecodedToken = jwtDecode(credential);
 
         const { email, name } = decodedToken;
-        console.log(decodedToken);
 
         const alreadyUser = await prisma.user.findUnique({
           where: {
             email: email,
           },
         });
-        console.log(alreadyUser);
 
         const isAdmin = process.env.ADMIN_EMAIL?.includes(email);
-        console.log(isAdmin);
 
         if (alreadyUser) {
           const user = await prisma.user.findUnique({
@@ -47,7 +44,7 @@ auth
             });
           }
 
-          res.send(user);
+          return res.send(user);
         } else if (!alreadyUser) {
           try {
             const user = await prisma.user.create({
@@ -59,28 +56,37 @@ auth
               },
             });
 
-            res.send(user);
+            return res.send(user);
           } catch (err) {
-            res.sendStatus(401);
+            return res.sendStatus(401);
           }
         }
       } catch (err) {
-        res.sendStatus(401);
+        return res.sendStatus(401);
       }
     }
   })
   .delete(async (req: Request, res: Response) => {
     const id = req.body.id;
 
-    await prisma.user
-      .delete({
-        where: {
-          id: id,
-        },
-      })
-      .then(() => {
-        res.send(200);
-      });
+    if (!id) {
+      res.json({ message: "Id de usuário faltando" }).status(422);
+    } else {
+      await prisma.user
+        .delete({
+          where: {
+            id: id,
+          },
+        })
+        .then(() => {
+          return res.send(200);
+        })
+        .catch((err) => {
+          console.log(err);
+          console.log(id);
+         return res.sendStatus(401);
+        });
+    }
   });
 
 export default auth;

@@ -46,52 +46,55 @@ payment.route("/payment").post(async (req: Request, res: Response) => {
   });
 
   if (available) {
-    const session = await stripe.checkout.sessions.create({
-      line_items: cart.map((product) => {
-        return {
-          price_data: {
-            currency: "brl",
-            unit_amount: product.price * 100,
-            product_data: {
-              name: product.name,
+    try {
+      const session = await stripe.checkout.sessions.create({
+        line_items: cart.map((product) => {
+          return {
+            price_data: {
+              currency: "brl",
+              unit_amount: product.price * 100,
+              product_data: {
+                name: product.name,
+              },
             },
-          },
-          quantity: product.number,
-        };
-      }),
+            quantity: product.number,
+          };
+        }),
 
-      mode: "payment",
-      success_url: `https://casa-verde-alpha-seven.vercel.app/paymentsuccess`,
-      cancel_url: `https://casa-verde-alpha-seven.vercel.app/paymentfailed`,
-    });
-    const date = new Date();
+        mode: "payment",
+        success_url: `https://casa-verde-alpha-seven.vercel.app/paymentsuccess`,
+        cancel_url: `https://casa-verde-alpha-seven.vercel.app/paymentfailed`,
+      });
 
-    await prisma.pedido.create({
-      data: {
-        cart: cart,
-        id: session.id,
-        status: session.status,
-        userId: userId,
-        subTotal: session.amount_total / 100,
-        paymentUrl: session.url,
-        paymentIntent: undefined,
-      },
-    });
-
-    for (let product of cart) {
-      await prisma.planta.update({
-        where: {
-          id: product.id,
-        },
+      await prisma.pedido.create({
         data: {
-          tempNumber: {
-            decrement: product.number,
-          },
+          cart: cart,
+          id: session.id,
+          status: session.status,
+          userId: userId,
+          subTotal: session.amount_total / 100,
+          paymentUrl: session.url,
+          paymentIntent: undefined,
         },
       });
-    }
 
-    res.send({ href: session.url });
+      for (let product of cart) {
+        await prisma.planta.update({
+          where: {
+            id: product.id,
+          },
+          data: {
+            tempNumber: {
+              decrement: product.number,
+            },
+          },
+        });
+      }
+
+      return res.send({ href: session.url });
+    } catch (err) {
+      return res.send(err).status(400);
+    }
   }
 });
 

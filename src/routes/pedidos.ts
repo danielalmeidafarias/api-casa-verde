@@ -18,7 +18,7 @@ pedidos.route("/pedidos/:userId").get(async (req: Request, res: Response) => {
     },
   });
 
-  res.send(pedidos);
+  return res.send(pedidos);
 });
 
 pedidos
@@ -27,19 +27,27 @@ pedidos
     const userId = req.params.userId;
     const session_id = req.body.session_id;
 
-    await stripe.checkout.sessions.expire(session_id);
+    if (!userId || !session_id) {
+      return res.sendStatus(422);
+    } else {
+      try {
+        await stripe.checkout.sessions.expire(session_id);
 
-    await prisma.pedido.update({
-      where: {
-        userId: userId,
-        id: session_id,
-      },
-      data: {
-        status: `expired`,
-      },
-    });
+        await prisma.pedido.update({
+          where: {
+            userId: userId,
+            id: session_id,
+          },
+          data: {
+            status: `expired`,
+          },
+        });
 
-    res.sendStatus(200);
+        return res.sendStatus(200);
+      } catch (err) {
+        return res.send(err).status(400);
+      }
+    }
   });
 
 pedidos
@@ -48,11 +56,19 @@ pedidos
     const userId = req.params.userId;
     const payment_intent = req.body.payment_intent;
 
-    await stripe.refunds.create({
-      payment_intent: payment_intent,
-    });
+    if (!userId || !payment_intent) {
+      return res.sendStatus(400);
+    } else {
+      try {
+        await stripe.refunds.create({
+          payment_intent: payment_intent,
+        });
 
-    res.send(200);
+        return res.sendStatus(200);
+      } catch (err) {
+        res.send(err).status(400);
+      }
+    }
   });
 
 export default pedidos;

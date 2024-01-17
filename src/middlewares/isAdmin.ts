@@ -18,12 +18,12 @@ const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
     });
 
     if (!adminUser || !process.env.ADMIN_EMAIL?.includes(adminUser?.email)) {
-      res.sendStatus(401);
+      return res.sendStatus(401);
     } else {
       next();
     }
   } else {
-    res.status(417).send({ Error: "Id faltando" });
+    return res.status(417).send({ Error: "Id faltando" });
   }
 };
 

@@ -4,13 +4,17 @@ import { prisma } from "../server";
 const promo = Router();
 
 promo.route("/promo").get(async (req: Request, res: Response) => {
-  const promoPlantas = await prisma.planta.findMany({
-    where: {
-      onSale: true,
-    },
-  });
+  try {
+    const promoPlantas = await prisma.planta.findMany({
+      where: {
+        onSale: true,
+      },
+    });
 
-  res.json(promoPlantas);
+    return res.json(promoPlantas);
+  } catch (err) {
+    return res.send(err).status(400);
+  }
 });
 
 export default promo;

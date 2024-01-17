@@ -5,14 +5,21 @@ const userInfo = Router();
 
 userInfo.route("/userinfo/:userid").get(async (req: Request, res: Response) => {
   const userId = req.params.userid;
+  if (!userId) {
+    return res.sendStatus(422);
+  } else {
+    try {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-  });
-
-  res.send(user);
+      return res.send(user);
+    } catch (err) {
+      return res.send(err).status(400);
+    }
+  }
 });
 
 export default userInfo;

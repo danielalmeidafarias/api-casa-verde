@@ -26,37 +26,46 @@ const sendEmail = async (transporter: any, mailOptions: any) => {
 newsLetter
   .route("/newsletter/send")
   .get(async (req: Request, res: Response) => {
-    res.sendStatus(200);
+    try {
+      const allEmails = await prisma.newsLetterEmail.findMany();
+      res.json(allEmails).status(200);
+    } catch (err) {
+      return res.send(err).status(400);
+    }
   })
   .post(async (req: Request, res: Response) => {
-    const emails = Array.from(
-      await prisma.newsLetterEmail.findMany(),
-      (email) => {
-        return email.email;
-      }
-    );
-
     const subject = req.body.subject;
     const text = req.body?.text;
     const html = req.body?.html;
 
-    const mailOptions = {
-      from: {
-        name: "Casa Verde",
-        address: process.env.EMAIL,
-      },
-      to: emails,
-      subject: subject,
-      text: text,
-      html: html,
-    };
+    if (!subject || (!text && !html)) {
+      return res.sendStatus(422);
+    } else {
+      try {
+        const emails = Array.from(
+          await prisma.newsLetterEmail.findMany(),
+          (email) => {
+            return email.email;
+          }
+        );
 
-    try {
-      sendEmail(transporter, mailOptions);
-      res.sendStatus(200);
-    } catch (err) {
-      res.send(err);
-      console.error(err);
+        const mailOptions = {
+          from: {
+            name: "Casa Verde",
+            address: process.env.EMAIL,
+          },
+          to: emails,
+          subject: subject,
+          text: text,
+          html: html,
+        };
+
+        sendEmail(transporter, mailOptions);
+        return res.sendStatus(200);
+      } catch (err) {
+        return res.send(err).status(400);
+        console.error(err);
+      }
     }
   });
 
