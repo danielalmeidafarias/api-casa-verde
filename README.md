@@ -8,10 +8,15 @@
   
 ## .ENV
 DATABASE_URL=''
+
 EMAIL = 'email@outlook.com'
+
 PASSWORD = 'password'
+
 ADMIN_EMAIL = ['']
+
 STRIPE_KEY = ""
+
 WEBHOOKS_KEY = ""
 
 ## /api
