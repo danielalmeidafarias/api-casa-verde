@@ -7,19 +7,12 @@
 * npm run build
   
 ## .ENV
-* Conexão com banco de dados
 DATABASE_URL=''
-* Dados para envio de emails
 EMAIL = 'email@outlook.com'
 PASSWORD = 'password'
-* Configuração do Admin
-* Lista de emails com acesso a Administração
 ADMIN_EMAIL = ['']
-* Chave API Secreta Stripe
 STRIPE_KEY = ""
-* Chave secreta dos WebHooks Stripe
 WEBHOOKS_KEY = ""
-
 
 ## /api
 ### GET /plantas
