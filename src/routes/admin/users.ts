@@ -8,7 +8,8 @@ users.route("/users").get(async (req: Request, res: Response) => {
     const users = await prisma.user.findMany();
     return res.send(users);
   } catch (err) {
-    return res.send(err).status(400);
+    console.error(err);
+    return res.status(400).send(err);
   }
 });
 

@@ -11,16 +11,20 @@ const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
   }
 
   if (adminId) {
-    const adminUser = await prisma.user.findUnique({
-      where: {
-        id: adminId,
-      },
-    });
+    try {
+      const adminUser = await prisma.user.findUnique({
+        where: {
+          id: adminId,
+        },
+      });
 
-    if (!adminUser || !process.env.ADMIN_EMAIL?.includes(adminUser?.email)) {
+      if (!adminUser || !process.env.ADMIN_EMAIL?.includes(adminUser?.email)) {
+        return res.sendStatus(401);
+      } else {
+        next();
+      }
+    } catch (err) {
       return res.sendStatus(401);
-    } else {
-      next();
     }
   } else {
     return res.status(417).send({ Error: "Id faltando" });

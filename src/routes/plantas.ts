@@ -24,7 +24,7 @@ plantas.route("/plantas").get(async (req: Request, res: Response) => {
 
     return res.json(todasPlantas);
   } catch (err) {
-    return res.send(err).status(400);
+    return res.status(400).send(err);
   }
 });
 
@@ -32,7 +32,7 @@ plantas.route("/plantas/:id").get(async (req: Request, res: Response) => {
   const idPlanta = req.params.id;
 
   if (!idPlanta) {
-    return res.sendStatus(422);
+    return res.status(422).send({ message: "Id da planta faltando" });
   } else {
     try {
       const planta = await prisma.planta.findUnique({
@@ -49,6 +49,10 @@ plantas.route("/plantas/:id").get(async (req: Request, res: Response) => {
         },
       });
 
+      if(!planta) {
+        return res.status(409).send({message: "Nenhuma planta com o id fornecido foi encontrada"})
+      }
+
       res.json({
         id: planta?.id,
         image: planta?.image,
@@ -58,7 +62,7 @@ plantas.route("/plantas/:id").get(async (req: Request, res: Response) => {
         number: planta?.tempNumber,
       });
     } catch (err) {
-      return res.send(err).status(400);
+      return res.status(400).send(err);
     }
   }
 });

@@ -13,7 +13,17 @@ payment.route("/payment").post(async (req: Request, res: Response) => {
 
   const estoque = await prisma.planta.findMany();
 
+  if (!cart) {
+    return res.status(409).send({ message: "Carrinho está faltando" });
+  }
+
   cart.forEach((produto) => {
+    if (!produto.id || !produto.name || !produto.number || !produto.price) {
+      return res
+        .status(400)
+        .send({ message: `dados do produto ${produto} faltando` });
+    }
+
     const produtoEstoque = estoque.filter((produtoEstoque) => {
       return produtoEstoque.id === produto.id;
     })[0];
@@ -62,8 +72,8 @@ payment.route("/payment").post(async (req: Request, res: Response) => {
         }),
 
         mode: "payment",
-        success_url: `https://casa-verde-alpha-seven.vercel.app/paymentsuccess`,
-        cancel_url: `https://casa-verde-alpha-seven.vercel.app/paymentfailed`,
+        success_url: `http://localhost:4173/paymentsuccess`,
+        cancel_url: `http://localhost:4173/paymentfailed`,
       });
 
       await prisma.pedido.create({
@@ -93,7 +103,7 @@ payment.route("/payment").post(async (req: Request, res: Response) => {
 
       return res.send({ href: session.url });
     } catch (err) {
-      return res.send(err).status(400);
+      return res.status(400).send(err);
     }
   }
 });

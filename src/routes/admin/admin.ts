@@ -6,7 +6,9 @@ import users from "./users";
 
 const admin = Router();
 admin.use(isAdmin);
-
+admin.get("/", async (req: Request, res: Response) => {
+  return res.send("Admin logado")
+})
 admin.use(plantas);
 admin.use(newsLetter);
 admin.use(users);

@@ -30,7 +30,8 @@ newsLetter
       const allEmails = await prisma.newsLetterEmail.findMany();
       res.json(allEmails).status(200);
     } catch (err) {
-      return res.send(err).status(400);
+      console.error(err);
+      return res.status(400).send(err);
     }
   })
   .post(async (req: Request, res: Response) => {
@@ -38,8 +39,12 @@ newsLetter
     const text = req.body?.text;
     const html = req.body?.html;
 
-    if (!subject || (!text && !html)) {
-      return res.sendStatus(422);
+    if (!subject) {
+      return res.status(422).send({ message: "Assunto faltando" });
+    } else if (!text && !html) {
+      return res
+        .status(422)
+        .send({ message: "O email deve conter mensagem de texto ou html" });
     } else {
       try {
         const emails = Array.from(
@@ -61,10 +66,12 @@ newsLetter
         };
 
         sendEmail(transporter, mailOptions);
-        return res.sendStatus(200);
+        return res
+          .status(200)
+          .send({ message: "Email registrado com sucesso" });
       } catch (err) {
-        return res.send(err).status(400);
         console.error(err);
+        return res.status(400).send(err);
       }
     }
   });

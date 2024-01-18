@@ -6,7 +6,7 @@ const userInfo = Router();
 userInfo.route("/userinfo/:userid").get(async (req: Request, res: Response) => {
   const userId = req.params.userid;
   if (!userId) {
-    return res.sendStatus(422);
+    return res.status(422).send({ message: "Id de usuario faltando" });
   } else {
     try {
       const user = await prisma.user.findUnique({
@@ -17,7 +17,7 @@ userInfo.route("/userinfo/:userid").get(async (req: Request, res: Response) => {
 
       return res.send(user);
     } catch (err) {
-      return res.send(err).status(400);
+      return res.status(400).send(err);
     }
   }
 });

@@ -13,7 +13,7 @@ promo.route("/promo").get(async (req: Request, res: Response) => {
 
     return res.json(promoPlantas);
   } catch (err) {
-    return res.send(err).status(400);
+    return res.status(400).send(err);
   }
 });
 

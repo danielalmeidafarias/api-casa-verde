@@ -29,7 +29,7 @@ newsLetter
     const email = req.body.email;
 
     if (!email) {
-      res.json({ message: "email faltando" }).status(422);
+      res.status(422).send({ message: "email faltando" });
     } else {
       const mailOptions = {
         from: {
@@ -55,24 +55,30 @@ newsLetter
           },
         })
       ) {
-        return res.json({message: "Email ja cadastrado"}).status(409);
-        
+        return res.status(409).send({ message: "Email ja cadastrado" });
       } else {
         try {
-          sendEmail(transporter, mailOptions).then(async () => {
-            await prisma.newsLetterEmail.create({
-              data: {
-                email: email,
-              },
+          sendEmail(transporter, mailOptions)
+            .then(async () => {
+              try {
+                await prisma.newsLetterEmail.create({
+                  data: {
+                    email: email,
+                  },
+                });
+              } catch (err) {
+                console.error(err);
+                return res.status(400).send(err);
+              }
+            })
+            .then(() => {
+              return res
+                .status(200)
+                .send({ message: "Email registrado com sucesso" });
             });
-          }).then(() => {
-           return res.sendStatus(200)
-          }).catch(err => {
-           return res.sendStatus(400)
-          });
         } catch (err) {
           console.error(err);
-          return res.sendStatus(400);
+          return res.status(400).send(err);
         }
       }
     }
@@ -81,7 +87,7 @@ newsLetter
     const email = req.body.email;
 
     if (!email) {
-      res.json({ message: "email faltando" }).status(422);
+      res.status(422).send({ message: "email faltando" });
     } else {
       if (
         !(await prisma.newsLetterEmail.findUnique({
@@ -90,15 +96,24 @@ newsLetter
           },
         }))
       ) {
-        return res.sendStatus(406);
+        return res.status(406).send({ message: "Email nao cadastrado" });
       } else {
-        await prisma.newsLetterEmail.delete({
-          where: {
-            email: email,
-          },
-        }).then(() => {
-          return res.sendStatus(200)
-        })
+        try {
+          await prisma.newsLetterEmail
+            .delete({
+              where: {
+                email: email,
+              },
+            })
+            .then(() => {
+              return res
+                .status(200)
+                .send({ message: "Email excluido com sucesso" });
+            });
+        } catch (err) {
+          console.error(err);
+          return res.status(400).send(err);
+        }
       }
     }
   });

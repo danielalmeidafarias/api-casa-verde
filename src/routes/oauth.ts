@@ -12,7 +12,7 @@ auth
     const credential = req.body.credential;
 
     if (!credential) {
-      return res.sendStatus(401);
+      return res.status(401).send({ message: "credenciais faltando" });
     } else {
       try {
         const decodedToken: DecodedToken = jwtDecode(credential);
@@ -33,18 +33,40 @@ auth
               email: email,
             },
           });
-          if ((isAdmin && !user?.isAdmin) || (!isAdmin && user?.isAdmin)) {
-            await prisma.user.update({
-              where: {
-                email: email,
-              },
-              data: {
-                isAdmin: isAdmin,
-              },
-            });
+
+          if (!isAdmin && user?.isAdmin) {
+            try {
+              await prisma.user.update({
+                where: {
+                  email: email,
+                },
+                data: {
+                  isAdmin: isAdmin,
+                },
+              });
+
+              return res.sendStatus(401);
+            } catch (err) {
+              return res.status(400).send(err);
+            }
+          } else if (isAdmin && !user?.isAdmin) {
+            try {
+              const updatedUser = await prisma.user.update({
+                where: {
+                  email: email,
+                },
+                data: {
+                  isAdmin: isAdmin,
+                },
+              });
+
+              return res.status(200).send(updatedUser);
+            } catch (err) {
+              return res.status(400).send(err);
+            }
           }
 
-          return res.send(user);
+          return res.status(200).send(user);
         } else if (!alreadyUser) {
           try {
             const user = await prisma.user.create({
@@ -56,13 +78,14 @@ auth
               },
             });
 
-            return res.send(user);
+            return res.status(200).send(user);
           } catch (err) {
             return res.sendStatus(401);
           }
         }
       } catch (err) {
-        return res.sendStatus(401);
+        console.log(err);
+        return res.status(401).send(err);
       }
     }
   })
@@ -71,21 +94,31 @@ auth
 
     if (!id) {
       res.json({ message: "Id de usuário faltando" }).status(422);
+    } else if (
+      !(await prisma.user.findUnique({
+        where: {
+          id: id,
+        },
+      }))
+    ) {
+      res
+        .status(409)
+        .send({ message: "Nenhum usuario com o id fornecido foi encontrado" });
     } else {
-      await prisma.user
-        .delete({
-          where: {
-            id: id,
-          },
-        })
-        .then(() => {
-          return res.send(200);
-        })
-        .catch((err) => {
-          console.log(err);
-          console.log(id);
-         return res.sendStatus(401);
-        });
+      try {
+        await prisma.user
+          .delete({
+            where: {
+              id: id,
+            },
+          })
+          .then(() => {
+            return res.send(200);
+          });
+      } catch (err) {
+        console.error(err);
+        return res.status(401).send(err);
+      }
     }
   });
 
