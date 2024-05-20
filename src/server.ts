@@ -47,15 +47,3 @@ app.use("/admin", admin);
 app.listen(port, () => {
   console.log(`Servidor rodando da porta ${port}`);
 });
-
-https
-  .createServer(
-    {
-      cert: fs.readFileSync("./SSL/code.crt"),
-      key: fs.readFileSync("./SSL/code.key"),
-    },
-    app
-  )
-  .listen(3001, () => {
-    console.log("Servidor rodando em https na porta 3001");
-  });
