@@ -72,8 +72,8 @@ payment.route("/payment").post(async (req: Request, res: Response) => {
         }),
 
         mode: "payment",
-        success_url: `http://localhost:4173/paymentsuccess`,
-        cancel_url: `http://localhost:4173/paymentfailed`,
+        success_url: `https://casa-verde-lovat.vercel.app/paymentsuccess`,
+        cancel_url: `https://casa-verde-lovat.vercel.app/paymentfailed`,
       });
 
       await prisma.pedido.create({
